@@ -17,5 +17,5 @@ This assignment was the final project of the Computer Networks class. It consist
  # Java Threads
  This assignment was done for the Operating Systems class. We were tasked to implement a multithreaded application that generates the Collatz sequence using child and parent threads. This lab helped me better my understanding of how software interacts with hardware, specifically how threads work. This is a core concept in computing, and I found this assignment to demonstrate that concept well. This assignment demonstrates my systems level knowledge of computing, as well as effective problem solving skills.
 
-# FishFinder
+# [FishFinder](https://github.com/MerrittRuthrauff/FishFinder)
 This is my senior project. It demonstrates significant experience working individually. Depsite having to restart my project a week before the due date, I still believe that this demonstrates problem solving skills, software design skills, and determination. 
