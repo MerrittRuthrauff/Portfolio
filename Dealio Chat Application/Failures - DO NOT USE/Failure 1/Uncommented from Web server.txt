@@ -1,0 +1,75 @@
+int firstBlank = findChar(' ', 0, requestLine);
+            int secondBlank = findChar(' ', firstBlank + 1, requestLine);
+
+            int firstSlash = findChar('/', 0, requestLine);
+			int secondSlash = findChar('/', firstSlash + 1, requestLine);
+			
+            /* If it is a default query */
+            if (secondBlank < secondSlash) {
+                // default query using default document
+				resource = configuration.getDefaultDocument();
+            }
+            else {
+				//add resource to document root
+				resource = configuration.getDocumentRoot() + requestLine.substring(firstSlash, secondBlank);
+			}
+			
+			requestedFile = new File(resource); //file based on the resource request
+
+			if (requestedFile.exists() && !requestedFile.isDirectory()) { //if file exists and isDirectory is false
+				statusHeader = "HTTP/1.1 200 OK\r\n"; //start building header with a status code 200
+				contentLength = "Content-Length: " + requestedFile.length() + "\r\n"; //content length header
+				logStatus = "200"; //to use in the log to show our status code of the request
+
+			} else { //if file doesn't exist create 404 header and give the path to the 404.html
+				statusHeader = "HTTP/1.1 404 Not Found\r\n"; //write 404 status header
+				resource = configuration.getFourOhFourDocument(); //get 404 location 
+				requestedFile = new File(resource); //replace previous resource
+				contentLength = "Content-Length: " + requestedFile.length() + "\r\n"; //Content-length Header
+				logStatus = "404";
+			}
+
+			fileName = resource.substring(resource.lastIndexOf('/') + 1, resource.length()); //pars our the filename at end of resource
+			
+			//get the content type of the request using method
+			contentType = getContentType(fileName.substring(fileName.lastIndexOf("."), fileName.length())); 
+
+
+			calendar = Calendar.getInstance(); //get calandar instance and format it
+			SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+			dateFormat.setTimeZone(TimeZone.getTimeZone("MST")); //set MST timezone because Utah
+			logDate = dateFormat.format(calendar.getTime()); //log the date
+			dateHeader = "Date: " + logDate + "\r\n"; //create the date header
+			serverName = "Server: " + configuration.getServerName() + "\r\n"; //get the serverName header from configuration
+
+			completeHeader = statusHeader + dateHeader + contentType + serverName + contentLength + "Connection: close\r\n\r\n"; //Combine the remaining header pieces; add close
+
+			System.out.print(completeHeader);
+			
+			//splits[1] = splits[1].substring(1); //need to remove leading / from file path
+			
+			outputStream.write(completeHeader.getBytes()); //write the header to the client
+			outputStream.flush();
+			
+			streamFile = new BufferedInputStream(new FileInputStream(requestedFile)); //create an inputstream of the requested file
+			byte[] buffer = new byte[BUFFER_SIZE];
+
+			while ((numBytes = streamFile.read(buffer)) != -1) { //write the file to the client
+				outputStream.write(buffer, 0, numBytes);
+				outputStream.flush(); 
+			}
+			
+			InetAddress ipAddr = client.getInetAddress();//used to get IP Address of the client
+
+			logEvent = "\n" + ipAddr.getHostAddress() + " " + "[" + logDate + "]" + " " + requestLine + " " + logStatus + " " + contentLength;//write to LogFile
+
+			File logTextFile = new File(configuration.getLogFile()); //file object to use in the logging of requests
+			logger = new PrintWriter(new BufferedWriter(new FileWriter(logTextFile, true))); //create FileWriter; true allows editing via appending
+			logger.println(logEvent);//append logEvent String to the logTextFile
+
+			//close all connections
+			streamFile.close(); 
+			inputReader.close();
+			outputStream.close();
+			logger.close();
+			client.close();
