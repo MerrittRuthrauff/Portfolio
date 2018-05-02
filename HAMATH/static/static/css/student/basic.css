@@ -1,0 +1,31 @@
+html, body {
+    background-color: #eee;
+}
+.menu-container {
+    margin-top: 50;
+    margin-left: auto;
+    margin-right: auto;
+    width: 800px;
+    height: 500px;
+    background: white;
+    padding: 20px;
+}
+.title {
+    text-align: center;
+	margin-top: 10px;
+    margin-bottom: 20px;
+}
+.description {
+    margin-top: 10px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+.buttons {
+    margin-top: 50px;
+    text-align:center;
+}
+.btn {
+    width: 200px;
+    height: 50px;
+    margin-top: 10px;
+}
